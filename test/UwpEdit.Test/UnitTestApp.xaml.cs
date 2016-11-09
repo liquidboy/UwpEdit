@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
+﻿using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace UwpEdit.Test
@@ -22,6 +11,8 @@ namespace UwpEdit.Test
     /// </summary>
     sealed partial class App : Application
     {
+        #region Public Constructors
+
         /// <summary>
         /// Initializes the singleton application object. This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -32,6 +23,10 @@ namespace UwpEdit.Test
             this.Suspending += OnSuspending;
         }
 
+        #endregion Public Constructors
+
+        #region Protected Methods
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user. Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -39,13 +34,6 @@ namespace UwpEdit.Test
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-#if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                this.DebugSettings.EnableFrameRateCounter = true;
-            }
-#endif
-
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content, just ensure that
@@ -57,7 +45,7 @@ namespace UwpEdit.Test
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                if (e?.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: Load state from previously suspended application
                 }
@@ -71,8 +59,12 @@ namespace UwpEdit.Test
             // Ensure the current window is active
             Window.Current.Activate();
 
-            Microsoft.VisualStudio.TestPlatform.TestExecutor.UnitTestClient.Run(e.Arguments);
+            Microsoft.VisualStudio.TestPlatform.TestExecutor.UnitTestClient.Run(e?.Arguments);
         }
+
+        #endregion Protected Methods
+
+        #region Private Methods
 
         /// <summary>
         /// Invoked when Navigation to a certain page fails
@@ -81,7 +73,7 @@ namespace UwpEdit.Test
         /// <param name="e">Details about the navigation failure</param>
         private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+            Exit();
         }
 
         /// <summary>
@@ -97,5 +89,7 @@ namespace UwpEdit.Test
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+
+        #endregion Private Methods
     }
 }
