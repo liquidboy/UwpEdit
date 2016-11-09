@@ -1,4 +1,7 @@
-﻿using Windows.ApplicationModel;
+﻿// Copyright (c) Phill Campbell. All rights reserved. Licensed under the MIT License. See LICENSE in
+// the project root for license information.
+
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
