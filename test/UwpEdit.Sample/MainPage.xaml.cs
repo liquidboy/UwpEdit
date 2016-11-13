@@ -135,6 +135,19 @@ namespace UwpEdit.Sample
             }
         }
 
+        private void ToggleTextAlignmentButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((int)textEditor.TextAlignment < 4)
+            {
+                textEditor.TextAlignment = (TextAlignment)((int)textEditor.TextAlignment + 1);
+            }
+            else
+            {
+                textEditor.TextAlignment = (TextAlignment)0;
+            }
+            textBox.TextAlignment = textEditor.TextAlignment;
+        }
+
         #endregion Private Methods
     }
 }

@@ -33,6 +33,7 @@ namespace UwpEdit
         private ScrollViewer _contentElement;
         private CanvasSolidColorBrush _forgroundBrush;
         private ContentPresenter _headerContentPresenter;
+        private CanvasHorizontalAlignment _horizontalAlignment;
         private bool _needsForgroundBrushRecreation;
         private bool _needsTextFormatRecreation;
         private bool _needsTextLayoutRecreation;
@@ -70,6 +71,8 @@ namespace UwpEdit
 
             UpdateHeaderVisibility();
             UpdatePlaceholderTextVisibility();
+            UpdateTextAlignment();
+
             RegisterPropertyChangedCallbacks();
             RegisterEventHandlers();
 
@@ -108,6 +111,7 @@ namespace UwpEdit
                 {
                     FontSize = (float)FontSize,
                     FontFamily = FontFamily.Source,
+                    HorizontalAlignment = _horizontalAlignment,
                 };
             }
 
@@ -147,6 +151,13 @@ namespace UwpEdit
             UpdateHeaderVisibility();
         }
 
+        private void OnTextAlignmentPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            UpdateTextAlignment();
+            _needsTextFormatRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
         private void OnTextPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             UpdatePlaceholderTextVisibility();
@@ -173,6 +184,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(TextProperty, OnTextPropertyChanged);
             RegisterPropertyChangedCallback(FontSizeProperty, OnFontSizePropertyChanged);
             RegisterPropertyChangedCallback(FontFamilyProperty, OnFontFamilyPropertyChanged);
+            RegisterPropertyChangedCallback(TextAlignmentProperty, OnTextAlignmentPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)
@@ -227,6 +239,32 @@ namespace UwpEdit
             else
             {
                 _placeholderTextContentPresenter.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void UpdateTextAlignment()
+        {
+            switch (TextAlignment)
+            {
+                case TextAlignment.Left:
+                    _horizontalAlignment = CanvasHorizontalAlignment.Left;
+                    break;
+
+                case TextAlignment.Center:
+                    _horizontalAlignment = CanvasHorizontalAlignment.Center;
+                    break;
+
+                case TextAlignment.Right:
+                    _horizontalAlignment = CanvasHorizontalAlignment.Right;
+                    break;
+
+                case TextAlignment.Justify:
+                    _horizontalAlignment = CanvasHorizontalAlignment.Justified;
+                    break;
+
+                case TextAlignment.DetectFromContent:
+                    _horizontalAlignment = CanvasHorizontalAlignment.Left;
+                    break;
             }
         }
 

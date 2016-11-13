@@ -46,6 +46,11 @@ namespace UwpEdit
         public static DependencyProperty SelectionHighlightColorProperty { get; } = DependencyProperty.Register(nameof(SelectionHighlightColor), typeof(SolidColorBrush), typeof(TextEditor), null);
 
         /// <summary>
+        /// Identifies the TextAlignment dependency property.
+        /// </summary>
+        public static DependencyProperty TextAlignmentProperty { get; } = DependencyProperty.Register(nameof(TextAlignment), typeof(TextAlignment), typeof(TextEditor), new PropertyMetadata(TextAlignment.Left));
+
+        /// <summary>
         /// Identifies the TextProperty dependency property.
         /// </summary>
         public static DependencyProperty TextProperty { get; } = DependencyProperty.Register(nameof(Text), typeof(string), typeof(TextEditor), null);
@@ -75,6 +80,11 @@ namespace UwpEdit
         /// Gets or sets the text content of a TextEditor.
         /// </summary>
         public string Text { get { return (string)GetValue(TextProperty); } set { SetValue(TextProperty, value); } }
+
+        /// <summary>
+        /// Gets or sets how the text should be aligned in the text editor.
+        /// </summary>
+        public TextAlignment TextAlignment { get { return (TextAlignment)GetValue(TextAlignmentProperty); } set { SetValue(TextAlignmentProperty, value); } }
 
         #endregion Public Properties
     }
