@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -50,6 +51,40 @@ namespace UwpEdit.Sample
 
         #region Private Methods
 
+        private void DecreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            textEditor.FontSize--;
+        }
+
+        private void IncreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            textEditor.FontSize++;
+        }
+
+        private void ToggleFontFamilyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (textEditor.FontFamily == Application.Current.Resources["ContentControlThemeFontFamily"])
+            {
+                textEditor.FontFamily = new FontFamily("Consolas");
+            }
+            else
+            {
+                textEditor.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
+            }
+        }
+
+        private void ToggleForegroundButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (textEditor.Foreground == Application.Current.Resources["SystemControlForegroundBaseHighBrush"])
+            {
+                textEditor.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            else
+            {
+                textEditor.Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlForegroundBaseHighBrush"];
+            }
+        }
+
         private void ToggleHeaderButton_Click(object sender, RoutedEventArgs e)
         {
             if (textEditor.Header == null)
@@ -66,7 +101,7 @@ namespace UwpEdit.Sample
         {
             if (textEditor.HeaderTemplate == null)
             {
-                var dataTemplateXaml = "<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Grid><TextBlock Text=\"{Binding}\" Foreground=\"Red\" /></Grid></DataTemplate>";
+                var dataTemplateXaml = "<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Grid><TextBlock Text=\"{Binding}\" Foreground=\"Red\" FontSize=\"15\"/></Grid></DataTemplate>";
                 var dataTemplate = XamlReader.Load(dataTemplateXaml) as DataTemplate;
                 textEditor.HeaderTemplate = dataTemplate;
             }

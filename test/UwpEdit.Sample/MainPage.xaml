@@ -27,11 +27,15 @@ Licensed under the MIT License. See LICENSE in the project root for license info
                             Header="UwpEdit.TextEditor"
                             Grid.Row="1"
                             Margin="16,16,16,0" />
-        <StackPanel Orientation="Horizontal"
-                    Grid.Row="2">
-            <Button Margin="16,16,0,0" Content="Toggle Header" Click="ToggleHeaderButton_Click" />
-            <Button Margin="16,16,0,0" Content="Toggle Header Template" Click="ToggleHeaderTemplateButton_Click" />
-            <Button Margin="16,16,0,0" Content="Toggle Placeholder Text" Click="TogglePlaceholderTextButton_Click" />
-        </StackPanel>
+        <GridView Grid.Row="2"
+                  Margin="16,16,16,0">
+            <Button Width="200" Content="Toggle Header" Click="ToggleHeaderButton_Click" />
+            <Button Width="200" Content="Toggle Header Template" Click="ToggleHeaderTemplateButton_Click" />
+            <Button Width="200" Content="Toggle Placeholder Text" Click="TogglePlaceholderTextButton_Click" />
+            <Button Width="200" Content="Toggle Foreground" Click="ToggleForegroundButton_Click" />
+            <Button Width="200" Content="Increase Font Size" Click="IncreaseFontSizeButton_Click" />
+            <Button Width="200" Content="Decrease Font Size" Click="DecreaseFontSizeButton_Click" />
+            <Button Width="200" Content="Toggle Font Family" Click="ToggleFontFamilyButton_Click" />
+        </GridView>
     </Grid>
 </Page>

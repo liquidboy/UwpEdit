@@ -1,9 +1,13 @@
 ﻿// Copyright (c) Phill Campbell. All rights reserved. Licensed under the MIT License. See LICENSE in
 // the project root for license information.
 
+using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Brushes;
+using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -26,10 +30,14 @@ namespace UwpEdit
         #region Private Fields
 
         private CanvasControl _canvasElement;
-
         private ScrollViewer _contentElement;
-
+        private CanvasSolidColorBrush _forgroundBrush;
         private ContentPresenter _headerContentPresenter;
+        private bool _needsForgroundBrushRecreation;
+        private bool _needsTextFormatRecreation;
+        private bool _needsTextLayoutRecreation;
+        private CanvasTextFormat _textFormat;
+        private CanvasTextLayout _textLayout;
 
         #endregion Private Fields
 
@@ -53,15 +61,12 @@ namespace UwpEdit
         /// </summary>
         protected override void OnApplyTemplate()
         {
-            Unloaded += Control_Unloaded;
             _headerContentPresenter = GetTemplateChild("HeaderContentPresenter") as ContentPresenter;
             _contentElement = GetTemplateChild("ContentElement") as ScrollViewer;
             _canvasElement = new CanvasControl();
-            _canvasElement.Draw += CanvasElement_Draw;
             _contentElement.Content = _canvasElement;
 
-            UpdateHeader();
-
+            UpdateHeaderVisibility();
             RegisterPropertyChangedCallbacks();
             RegisterEventHandlers();
 
@@ -74,34 +79,96 @@ namespace UwpEdit
 
         private void CanvasElement_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
         {
+            _needsTextFormatRecreation = true;
+            _needsTextLayoutRecreation = true;
+            _needsForgroundBrushRecreation = true;
         }
 
         private void CanvasElement_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
+            EnsureResources(sender, sender.Size);
+
+            args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _forgroundBrush);
         }
 
-        private void Control_Unloaded(object sender, RoutedEventArgs e)
+        private void CanvasElement_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            _canvasElement.RemoveFromVisualTree();
-            _canvasElement = null;
+            _needsTextLayoutRecreation = true;
+        }
+
+        private void EnsureResources(ICanvasResourceCreatorWithDpi resourceCreator, Size targetSize)
+        {
+            if (_needsTextFormatRecreation)
+            {
+                _textFormat?.Dispose();
+                _textFormat = new CanvasTextFormat()
+                {
+                    FontSize = (float)FontSize,
+                    FontFamily = FontFamily.Source,
+                };
+            }
+
+            if (_needsTextLayoutRecreation)
+            {
+                _textLayout?.Dispose();
+                _textLayout = new CanvasTextLayout(resourceCreator, Text, _textFormat, (float)targetSize.Width, (float)targetSize.Height);
+            }
+
+            if (_needsForgroundBrushRecreation)
+            {
+                _forgroundBrush?.Dispose();
+                _forgroundBrush = new CanvasSolidColorBrush(resourceCreator, (Foreground as SolidColorBrush).Color);
+            }
+        }
+
+        private void OnFontFamilyPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsTextFormatRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
+        private void OnFontSizePropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsTextFormatRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
+        private void OnForegroundPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsForgroundBrushRecreation = true;
+            _canvasElement.Invalidate();
         }
 
         private void OnHeaderPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
-            UpdateHeader();
+            UpdateHeaderVisibility();
+        }
+
+        private void OnTextPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _canvasElement.Invalidate();
         }
 
         private void RegisterEventHandlers()
         {
+            Unloaded += TextEditor_Unloaded;
             PointerEntered += TextEditor_PointerEntered;
             PointerExited += TextEditor_PointerExited;
             GotFocus += TextEditor_GotFocus;
             LostFocus += TextEditor_LostFocus;
+
+            _canvasElement.CreateResources += CanvasElement_CreateResources;
+            _canvasElement.SizeChanged += CanvasElement_SizeChanged;
+            _canvasElement.Draw += CanvasElement_Draw;
         }
 
         private void RegisterPropertyChangedCallbacks()
         {
             RegisterPropertyChangedCallback(HeaderProperty, OnHeaderPropertyChanged);
+            RegisterPropertyChangedCallback(ForegroundProperty, OnForegroundPropertyChanged);
+            RegisterPropertyChangedCallback(TextProperty, OnTextPropertyChanged);
+            RegisterPropertyChangedCallback(FontSizeProperty, OnFontSizePropertyChanged);
+            RegisterPropertyChangedCallback(FontFamilyProperty, OnFontFamilyPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)
@@ -130,7 +197,16 @@ namespace UwpEdit
             }
         }
 
-        private void UpdateHeader()
+        private void TextEditor_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _canvasElement.RemoveFromVisualTree();
+            _canvasElement = null;
+
+            _forgroundBrush?.Dispose();
+            _textLayout?.Dispose();
+        }
+
+        private void UpdateHeaderVisibility()
         {
             if (_headerContentPresenter != null)
             {
