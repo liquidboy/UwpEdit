@@ -54,13 +54,13 @@ namespace UwpEdit.Sample
         private void DecreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
         {
             textEditor.FontSize--;
-            textBox.FontSize--;
+            textBox.FontSize = textEditor.FontSize;
         }
 
         private void IncreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
         {
             textEditor.FontSize++;
-            textBox.FontSize++;
+            textBox.FontSize = textEditor.FontSize;
         }
 
         private void ToggleFontFamilyButton_Click(object sender, RoutedEventArgs e)
@@ -68,13 +68,12 @@ namespace UwpEdit.Sample
             if (textEditor.FontFamily == Application.Current.Resources["ContentControlThemeFontFamily"])
             {
                 textEditor.FontFamily = new FontFamily("Consolas");
-                textBox.FontFamily = new FontFamily("Consolas");
             }
             else
             {
                 textEditor.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
-                textBox.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
             }
+            textBox.FontFamily = textEditor.FontFamily;
         }
 
         private void ToggleForegroundButton_Click(object sender, RoutedEventArgs e)
@@ -82,13 +81,12 @@ namespace UwpEdit.Sample
             if (textEditor.Foreground == Application.Current.Resources["SystemControlForegroundBaseHighBrush"])
             {
                 textEditor.Foreground = new SolidColorBrush(Colors.Red);
-                textBox.Foreground = new SolidColorBrush(Colors.Red);
             }
             else
             {
                 textEditor.Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlForegroundBaseHighBrush"];
-                textBox.Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlForegroundBaseHighBrush"];
             }
+            textBox.Foreground = textEditor.Foreground;
         }
 
         private void ToggleHeaderButton_Click(object sender, RoutedEventArgs e)
@@ -101,7 +99,7 @@ namespace UwpEdit.Sample
             else
             {
                 textEditor.Header = null;
-                textBox.Header = null;
+                textBox.Header = textEditor.Header;
             }
         }
 
@@ -112,13 +110,12 @@ namespace UwpEdit.Sample
                 var dataTemplateXaml = "<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Grid><TextBlock Text=\"{Binding}\" Foreground=\"Red\" FontSize=\"15\"/></Grid></DataTemplate>";
                 var dataTemplate = XamlReader.Load(dataTemplateXaml) as DataTemplate;
                 textEditor.HeaderTemplate = dataTemplate;
-                textBox.HeaderTemplate = dataTemplate;
             }
             else
             {
                 textEditor.HeaderTemplate = null;
-                textBox.HeaderTemplate = null;
             }
+            textBox.HeaderTemplate = textEditor.HeaderTemplate;
         }
 
         private void TogglePlaceholderTextButton_Click(object sender, RoutedEventArgs e)
@@ -126,13 +123,12 @@ namespace UwpEdit.Sample
             if (string.IsNullOrEmpty(textEditor.PlaceholderText))
             {
                 textEditor.PlaceholderText = "This is some placeholder text.";
-                textBox.PlaceholderText = "This is some placeholder text.";
             }
             else
             {
                 textEditor.PlaceholderText = string.Empty;
-                textBox.PlaceholderText = string.Empty;
             }
+            textBox.PlaceholderText = textEditor.PlaceholderText;
         }
 
         private void ToggleTextAlignmentButton_Click(object sender, RoutedEventArgs e)
