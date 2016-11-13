@@ -22,9 +22,11 @@ Licensed under the MIT License. See LICENSE in the project root for license info
                  Header="Windows.UI.Xaml.TextBox"
                  Grid.Row="0"
                  Margin="16,16,16,0"
-                 Text="{x:Bind Text}" />
+                 Text="{x:Bind Text, Mode=TwoWay}"
+                 PlaceholderText="This is some placeholder text." />
         <uwpedit:TextEditor x:Name="textEditor"
-                            Text="{x:Bind Text}"
+                            Text="{x:Bind Text, Mode=TwoWay}"
+                            PlaceholderText="This is some placeholder text."
                             Header="UwpEdit.TextEditor"
                             Grid.Row="1"
                             Margin="16,16,16,0" />

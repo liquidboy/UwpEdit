@@ -36,6 +36,7 @@ namespace UwpEdit
         private bool _needsForgroundBrushRecreation;
         private bool _needsTextFormatRecreation;
         private bool _needsTextLayoutRecreation;
+        private ContentControl _placeholderTextContentPresenter;
         private CanvasTextFormat _textFormat;
         private CanvasTextLayout _textLayout;
 
@@ -62,11 +63,13 @@ namespace UwpEdit
         protected override void OnApplyTemplate()
         {
             _headerContentPresenter = GetTemplateChild("HeaderContentPresenter") as ContentPresenter;
+            _placeholderTextContentPresenter = GetTemplateChild("PlaceholderTextContentPresenter") as ContentControl;
             _contentElement = GetTemplateChild("ContentElement") as ScrollViewer;
             _canvasElement = new CanvasControl();
             _contentElement.Content = _canvasElement;
 
             UpdateHeaderVisibility();
+            UpdatePlaceholderTextVisibility();
             RegisterPropertyChangedCallbacks();
             RegisterEventHandlers();
 
@@ -146,6 +149,7 @@ namespace UwpEdit
 
         private void OnTextPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
+            UpdatePlaceholderTextVisibility();
             _canvasElement.Invalidate();
         }
 
@@ -211,6 +215,18 @@ namespace UwpEdit
             if (_headerContentPresenter != null)
             {
                 _headerContentPresenter.Visibility = _headerContentPresenter.Content == null ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
+        private void UpdatePlaceholderTextVisibility()
+        {
+            if (string.IsNullOrWhiteSpace(Text))
+            {
+                _placeholderTextContentPresenter.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                _placeholderTextContentPresenter.Visibility = Visibility.Collapsed;
             }
         }
 

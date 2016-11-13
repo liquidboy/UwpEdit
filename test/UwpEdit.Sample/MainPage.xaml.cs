@@ -123,15 +123,15 @@ namespace UwpEdit.Sample
 
         private void TogglePlaceholderTextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (textEditor.PlaceholderText == null)
+            if (string.IsNullOrEmpty(textEditor.PlaceholderText))
             {
                 textEditor.PlaceholderText = "This is some placeholder text.";
                 textBox.PlaceholderText = "This is some placeholder text.";
             }
             else
             {
-                textEditor.PlaceholderText = null;
-                textBox.PlaceholderText = null;
+                textEditor.PlaceholderText = string.Empty;
+                textBox.PlaceholderText = string.Empty;
             }
         }
 
