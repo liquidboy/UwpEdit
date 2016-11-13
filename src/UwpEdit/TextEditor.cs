@@ -109,9 +109,10 @@ namespace UwpEdit
                 _textFormat?.Dispose();
                 _textFormat = new CanvasTextFormat()
                 {
-                    FontSize = (float)FontSize,
-                    FontFamily = FontFamily.Source,
                     HorizontalAlignment = _horizontalAlignment,
+                    FontFamily = FontFamily.Source,
+                    FontSize = (float)FontSize,
+                    FontStretch = FontStretch,
                     FontStyle = FontStyle,
                     FontWeight = FontWeight,
                 };
@@ -137,6 +138,12 @@ namespace UwpEdit
         }
 
         private void OnFontSizePropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsTextFormatRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
+        private void OnFontStretchPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             _needsTextFormatRecreation = true;
             _canvasElement.Invalidate();
@@ -201,6 +208,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(TextAlignmentProperty, OnTextAlignmentPropertyChanged);
             RegisterPropertyChangedCallback(FontStyleProperty, OnFontStylePropertyChanged);
             RegisterPropertyChangedCallback(FontWeightProperty, OnFontWeightPropertyChanged);
+            RegisterPropertyChangedCallback(FontStretchProperty, OnFontStretchPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)

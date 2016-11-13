@@ -87,11 +87,28 @@ namespace UwpEdit.Sample
             {
                 textEditor.FontFamily = new FontFamily("Consolas");
             }
+            else if (textEditor.FontFamily.Source == "Consolas")
+            {
+                textEditor.FontFamily = new FontFamily("Arial");
+            }
             else
             {
                 textEditor.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
             }
             textBox.FontFamily = textEditor.FontFamily;
+        }
+
+        private void ToggleFontStretchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((int)textEditor.FontStretch < 9)
+            {
+                textEditor.FontStretch = (FontStretch)((int)textEditor.FontStretch + 1);
+            }
+            else
+            {
+                textEditor.FontStretch = (FontStretch)1;
+            }
+            textBox.FontStretch = textEditor.FontStretch;
         }
 
         private void ToggleFontStyleButton_Click(object sender, RoutedEventArgs e)

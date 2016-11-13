@@ -42,6 +42,7 @@ Licensed under the MIT License. See LICENSE in the project root for license info
             <Button Width="200" Content="Toggle Text Alignment" Click="ToggleTextAlignmentButton_Click" />
             <Button Width="200" Content="Toggle Font Style" Click="ToggleFontStyleButton_Click" />
             <Button Width="200" Content="Toggle Font Weight" Click="ToggleFontWeightButton_Click" />
+            <Button Width="200" Content="Toggle Font Stretch" Click="ToggleFontStretchButton_Click" />
         </GridView>
     </Grid>
 </Page>
