@@ -113,6 +113,7 @@ namespace UwpEdit
                     FontFamily = FontFamily.Source,
                     HorizontalAlignment = _horizontalAlignment,
                     FontStyle = FontStyle,
+                    FontWeight = FontWeight,
                 };
             }
 
@@ -142,6 +143,12 @@ namespace UwpEdit
         }
 
         private void OnFontStylePropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsTextFormatRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
+        private void OnFontWeightPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             _needsTextFormatRecreation = true;
             _canvasElement.Invalidate();
@@ -193,6 +200,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(FontFamilyProperty, OnFontFamilyPropertyChanged);
             RegisterPropertyChangedCallback(TextAlignmentProperty, OnTextAlignmentPropertyChanged);
             RegisterPropertyChangedCallback(FontStyleProperty, OnFontStylePropertyChanged);
+            RegisterPropertyChangedCallback(FontWeightProperty, OnFontWeightPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)

@@ -32,6 +32,23 @@ namespace UwpEdit.Sample
 
         private const string defaultText = "Welcome to UWP Edit. The text editor for UWP apps.";
 
+        private Dictionary<int, FontWeight> _fontWeights = new Dictionary<int, FontWeight>()
+        {
+            {0, FontWeights.Black },
+            {1, FontWeights.Bold },
+            {2, FontWeights.ExtraBlack },
+            {3, FontWeights.ExtraBold },
+            {4, FontWeights.ExtraLight },
+            {5, FontWeights.Light },
+            {6, FontWeights.Medium },
+            {7, FontWeights.Normal },
+            {8, FontWeights.SemiBold },
+            {9, FontWeights.SemiLight },
+            {10, FontWeights.Thin },
+        };
+
+        private int _selectedFontWeight = 7;
+
         #endregion Private Fields
 
         #region Public Constructors
@@ -88,6 +105,20 @@ namespace UwpEdit.Sample
                 textEditor.FontStyle = (FontStyle)0;
             }
             textBox.FontStyle = textEditor.FontStyle;
+        }
+
+        private void ToggleFontWeightButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedFontWeight < 9)
+            {
+                _selectedFontWeight++;
+            }
+            else
+            {
+                _selectedFontWeight = 0;
+            }
+            textEditor.FontWeight = _fontWeights[_selectedFontWeight];
+            textBox.FontWeight = textEditor.FontWeight;
         }
 
         private void ToggleForegroundButton_Click(object sender, RoutedEventArgs e)
