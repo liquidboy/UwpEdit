@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -74,6 +75,19 @@ namespace UwpEdit.Sample
                 textEditor.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
             }
             textBox.FontFamily = textEditor.FontFamily;
+        }
+
+        private void ToggleFontStyleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((int)textEditor.FontStyle < 2)
+            {
+                textEditor.FontStyle = (FontStyle)((int)textEditor.FontStyle + 1);
+            }
+            else
+            {
+                textEditor.FontStyle = (FontStyle)0;
+            }
+            textBox.FontStyle = textEditor.FontStyle;
         }
 
         private void ToggleForegroundButton_Click(object sender, RoutedEventArgs e)
