@@ -17,7 +17,8 @@ Licensed under the MIT License. See LICENSE in the project root for license info
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBox AcceptsReturn="True"
+        <TextBox x:Name="textBox"
+                 AcceptsReturn="True"
                  Header="Windows.UI.Xaml.TextBox"
                  Grid.Row="0"
                  Margin="16,16,16,0"

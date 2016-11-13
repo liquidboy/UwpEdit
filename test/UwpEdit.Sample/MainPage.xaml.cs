@@ -54,11 +54,13 @@ namespace UwpEdit.Sample
         private void DecreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
         {
             textEditor.FontSize--;
+            textBox.FontSize--;
         }
 
         private void IncreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
         {
             textEditor.FontSize++;
+            textBox.FontSize++;
         }
 
         private void ToggleFontFamilyButton_Click(object sender, RoutedEventArgs e)
@@ -66,10 +68,12 @@ namespace UwpEdit.Sample
             if (textEditor.FontFamily == Application.Current.Resources["ContentControlThemeFontFamily"])
             {
                 textEditor.FontFamily = new FontFamily("Consolas");
+                textBox.FontFamily = new FontFamily("Consolas");
             }
             else
             {
                 textEditor.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
+                textBox.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
             }
         }
 
@@ -78,10 +82,12 @@ namespace UwpEdit.Sample
             if (textEditor.Foreground == Application.Current.Resources["SystemControlForegroundBaseHighBrush"])
             {
                 textEditor.Foreground = new SolidColorBrush(Colors.Red);
+                textBox.Foreground = new SolidColorBrush(Colors.Red);
             }
             else
             {
                 textEditor.Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlForegroundBaseHighBrush"];
+                textBox.Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlForegroundBaseHighBrush"];
             }
         }
 
@@ -90,10 +96,12 @@ namespace UwpEdit.Sample
             if (textEditor.Header == null)
             {
                 textEditor.Header = "UwpEdit.TextEditor";
+                textBox.Header = "Windows.UI.Xaml.TextBox";
             }
             else
             {
                 textEditor.Header = null;
+                textBox.Header = null;
             }
         }
 
@@ -104,10 +112,12 @@ namespace UwpEdit.Sample
                 var dataTemplateXaml = "<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Grid><TextBlock Text=\"{Binding}\" Foreground=\"Red\" FontSize=\"15\"/></Grid></DataTemplate>";
                 var dataTemplate = XamlReader.Load(dataTemplateXaml) as DataTemplate;
                 textEditor.HeaderTemplate = dataTemplate;
+                textBox.HeaderTemplate = dataTemplate;
             }
             else
             {
                 textEditor.HeaderTemplate = null;
+                textBox.HeaderTemplate = null;
             }
         }
 
@@ -116,10 +126,12 @@ namespace UwpEdit.Sample
             if (textEditor.PlaceholderText == null)
             {
                 textEditor.PlaceholderText = "This is some placeholder text.";
+                textBox.PlaceholderText = "This is some placeholder text.";
             }
             else
             {
                 textEditor.PlaceholderText = null;
+                textBox.PlaceholderText = null;
             }
         }
 
