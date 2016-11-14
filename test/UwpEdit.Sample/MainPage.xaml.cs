@@ -72,13 +72,11 @@ namespace UwpEdit.Sample
         private void DecreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
         {
             textEditor.FontSize--;
-            textBox.FontSize = textEditor.FontSize;
         }
 
         private void IncreaseFontSizeButton_Click(object sender, RoutedEventArgs e)
         {
             textEditor.FontSize++;
-            textBox.FontSize = textEditor.FontSize;
         }
 
         private void SelectRangeButton_Click(object sender, RoutedEventArgs e)
@@ -102,7 +100,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.FontFamily = (FontFamily)Application.Current.Resources["ContentControlThemeFontFamily"];
             }
-            textBox.FontFamily = textEditor.FontFamily;
         }
 
         private void ToggleFontStretchButton_Click(object sender, RoutedEventArgs e)
@@ -115,7 +112,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.FontStretch = (FontStretch)1;
             }
-            textBox.FontStretch = textEditor.FontStretch;
         }
 
         private void ToggleFontStyleButton_Click(object sender, RoutedEventArgs e)
@@ -128,7 +124,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.FontStyle = (FontStyle)0;
             }
-            textBox.FontStyle = textEditor.FontStyle;
         }
 
         private void ToggleFontWeightButton_Click(object sender, RoutedEventArgs e)
@@ -142,7 +137,6 @@ namespace UwpEdit.Sample
                 _selectedFontWeight = 0;
             }
             textEditor.FontWeight = _fontWeights[_selectedFontWeight];
-            textBox.FontWeight = textEditor.FontWeight;
         }
 
         private void ToggleForegroundButton_Click(object sender, RoutedEventArgs e)
@@ -155,7 +149,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.Foreground = (SolidColorBrush)Application.Current.Resources["SystemControlForegroundBaseHighBrush"];
             }
-            textBox.Foreground = textEditor.Foreground;
         }
 
         private void ToggleHeaderButton_Click(object sender, RoutedEventArgs e)
@@ -163,12 +156,10 @@ namespace UwpEdit.Sample
             if (textEditor.Header == null)
             {
                 textEditor.Header = "UwpEdit.TextEditor";
-                textBox.Header = "Windows.UI.Xaml.TextBox";
             }
             else
             {
                 textEditor.Header = null;
-                textBox.Header = textEditor.Header;
             }
         }
 
@@ -184,7 +175,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.HeaderTemplate = null;
             }
-            textBox.HeaderTemplate = textEditor.HeaderTemplate;
         }
 
         private void TogglePlaceholderTextButton_Click(object sender, RoutedEventArgs e)
@@ -197,7 +187,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.PlaceholderText = string.Empty;
             }
-            textBox.PlaceholderText = textEditor.PlaceholderText;
         }
 
         private void ToggleSelectionColorButton_Click(object sender, RoutedEventArgs e)
@@ -210,7 +199,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.SelectionHighlightColor = (SolidColorBrush)Application.Current.Resources["SystemControlHighlightAccentBrush"];
             }
-            textBox.SelectionHighlightColor = textEditor.SelectionHighlightColor;
         }
 
         private void ToggleTextAlignmentButton_Click(object sender, RoutedEventArgs e)
@@ -223,7 +211,6 @@ namespace UwpEdit.Sample
             {
                 textEditor.TextAlignment = (TextAlignment)0;
             }
-            textBox.TextAlignment = textEditor.TextAlignment;
         }
 
         #endregion Private Methods

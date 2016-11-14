@@ -14,23 +14,15 @@ Licensed under the MIT License. See LICENSE in the project root for license info
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="textBox"
-                 AcceptsReturn="True"
-                 Header="Windows.UI.Xaml.TextBox"
-                 Grid.Row="0"
-                 Margin="16,16,16,0"
-                 Text="{x:Bind Text, Mode=TwoWay}"
-                 PlaceholderText="This is some placeholder text." />
         <uwpedit:TextEditor x:Name="textEditor"
                             Text="{x:Bind Text, Mode=TwoWay}"
                             PlaceholderText="This is some placeholder text."
                             Header="UwpEdit.TextEditor"
-                            Grid.Row="1"
+                            Grid.Row="0"
                             Margin="16,16,16,0" />
-        <GridView Grid.Row="2"
+        <GridView Grid.Row="1"
                   Margin="16,16,16,0">
             <Button Width="200" Content="Toggle Header" Click="ToggleHeaderButton_Click" />
             <Button Width="200" Content="Toggle Header Template" Click="ToggleHeaderTemplateButton_Click" />
