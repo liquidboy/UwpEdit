@@ -236,6 +236,7 @@ namespace UwpEdit
         private void OnTextPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             UpdatePlaceholderTextVisibility();
+            _selectionRanges?.Clear();
             _canvasElement.Invalidate();
         }
 
