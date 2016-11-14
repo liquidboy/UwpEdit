@@ -113,6 +113,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Range.cs" />
+    <Compile Include="TextEditor.PublicMethods.cs" />
     <Compile Include="TextEditor.Properties.cs" />
     <Compile Include="TextEditor.cs" />
   </ItemGroup>

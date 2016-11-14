@@ -7,7 +7,10 @@ using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -31,15 +34,24 @@ namespace UwpEdit
 
         private CanvasControl _canvasElement;
         private ScrollViewer _contentElement;
-        private CanvasSolidColorBrush _forgroundBrush;
+        private CanvasSolidColorBrush _foregroundBrush;
         private ContentPresenter _headerContentPresenter;
+
         private CanvasHorizontalAlignment _horizontalAlignment;
-        private bool _needsForgroundBrushRecreation;
+
+        private bool _needsForegroundBrushRecreation;
+
+        private bool _needsSelectionForegroundBrushRecreation;
         private bool _needsSelectionHighlightColorBrushRecreation;
+
         private bool _needsTextFormatRecreation;
+
         private bool _needsTextLayoutRecreation;
         private ContentControl _placeholderTextContentPresenter;
+
+        private CanvasSolidColorBrush _selectionForegroundBrush;
         private CanvasSolidColorBrush _selectionHighlightColorBrush;
+        private List<Range> _selectionRanges;
         private CanvasTextFormat _textFormat;
         private CanvasTextLayout _textLayout;
 
@@ -89,15 +101,29 @@ namespace UwpEdit
         {
             _needsTextFormatRecreation = true;
             _needsTextLayoutRecreation = true;
-            _needsForgroundBrushRecreation = true;
+            _needsForegroundBrushRecreation = true;
             _needsSelectionHighlightColorBrushRecreation = true;
+            _needsSelectionForegroundBrushRecreation = true;
         }
 
         private void CanvasElement_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
             EnsureResources(sender, sender.Size);
 
-            args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _forgroundBrush);
+            if ((FocusState != FocusState.Unfocused) && (_selectionRanges?.Any() ?? false))
+            {
+                foreach (var range in _selectionRanges)
+                {
+                    var descriptions = _textLayout.GetCharacterRegions(range.StartIndex, range.Length);
+                    foreach (CanvasTextLayoutRegion description in descriptions)
+                    {
+                        args.DrawingSession.FillRectangle(InflateRect(description.LayoutBounds), _selectionHighlightColorBrush);
+                    }
+                    _textLayout.SetBrush(range.StartIndex, range.Length, _selectionForegroundBrush);
+                }
+            }
+
+            args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _foregroundBrush);
         }
 
         private void CanvasElement_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -127,10 +153,10 @@ namespace UwpEdit
                 _textLayout = new CanvasTextLayout(resourceCreator, Text, _textFormat, (float)targetSize.Width, (float)targetSize.Height);
             }
 
-            if (_needsForgroundBrushRecreation)
+            if (_needsForegroundBrushRecreation)
             {
-                _forgroundBrush?.Dispose();
-                _forgroundBrush = new CanvasSolidColorBrush(resourceCreator, (Foreground as SolidColorBrush).Color);
+                _foregroundBrush?.Dispose();
+                _foregroundBrush = new CanvasSolidColorBrush(resourceCreator, (Foreground as SolidColorBrush).Color);
             }
 
             if (_needsSelectionHighlightColorBrushRecreation)
@@ -138,6 +164,19 @@ namespace UwpEdit
                 _selectionHighlightColorBrush?.Dispose();
                 _selectionHighlightColorBrush = new CanvasSolidColorBrush(resourceCreator, SelectionHighlightColor.Color);
             }
+
+            if (_needsSelectionForegroundBrushRecreation)
+            {
+                _selectionForegroundBrush?.Dispose();
+                _selectionForegroundBrush = new CanvasSolidColorBrush(resourceCreator, Colors.White);
+            }
+        }
+
+        private Rect InflateRect(Rect r)
+        {
+            return new Rect(
+                new Point(Math.Floor(r.Left), Math.Floor(r.Top)),
+                new Point(Math.Ceiling(r.Right), Math.Ceiling(r.Bottom)));
         }
 
         private void OnFontFamilyPropertyChanged(DependencyObject sender, DependencyProperty dp)
@@ -172,7 +211,7 @@ namespace UwpEdit
 
         private void OnForegroundPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
-            _needsForgroundBrushRecreation = true;
+            _needsForegroundBrushRecreation = true;
             _canvasElement.Invalidate();
         }
 
@@ -234,6 +273,8 @@ namespace UwpEdit
 
         private void TextEditor_LostFocus(object sender, RoutedEventArgs e)
         {
+            _selectionRanges?.Clear();
+            _canvasElement?.Invalidate();
             VisualStateManager.GoToState(this, "Normal", true);
         }
 
@@ -258,8 +299,11 @@ namespace UwpEdit
             _canvasElement.RemoveFromVisualTree();
             _canvasElement = null;
 
-            _forgroundBrush?.Dispose();
+            _selectionHighlightColorBrush?.Dispose();
+            _selectionForegroundBrush?.Dispose();
+            _foregroundBrush?.Dispose();
             _textLayout?.Dispose();
+            _textFormat?.Dispose();
         }
 
         private void UpdateHeaderVisibility()

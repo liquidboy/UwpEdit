@@ -81,6 +81,13 @@ namespace UwpEdit.Sample
             textBox.FontSize = textEditor.FontSize;
         }
 
+        private void SelectRangeButton_Click(object sender, RoutedEventArgs e)
+        {
+            var length = Math.Min(5, textEditor.Text.Length);
+            textEditor.Focus(FocusState.Programmatic);
+            textEditor.Select(0, length);
+        }
+
         private void ToggleFontFamilyButton_Click(object sender, RoutedEventArgs e)
         {
             if (textEditor.FontFamily == Application.Current.Resources["ContentControlThemeFontFamily"])
