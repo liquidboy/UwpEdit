@@ -42,6 +42,14 @@ namespace UwpEdit
             _canvasElement.Invalidate();
         }
 
+        /// <summary>
+        /// Selects the entire contents of the text box.
+        /// </summary>
+        public void SelectAll()
+        {
+            Select(0, Text.Length);
+        }
+
         #endregion Public Methods
     }
 }
