@@ -108,6 +108,11 @@ namespace UwpEdit
 
         private void CanvasElement_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
+#if DEBUG
+            var s = new System.Diagnostics.Stopwatch();
+            s.Start();
+#endif
+
             EnsureResources(sender, sender.Size);
 
             if ((FocusState != FocusState.Unfocused) && (_selectionRanges?.Any() ?? false))
@@ -124,6 +129,11 @@ namespace UwpEdit
             }
 
             args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _foregroundBrush);
+
+#if DEBUG
+            s.Stop();
+            System.Diagnostics.Debug.WriteLine($"Completed TextEditor.CanvasElement_Draw in {s.Elapsed}");
+#endif
         }
 
         private void CanvasElement_SizeChanged(object sender, SizeChangedEventArgs e)
