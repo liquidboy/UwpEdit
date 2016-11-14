@@ -193,6 +193,19 @@ namespace UwpEdit.Sample
             textBox.PlaceholderText = textEditor.PlaceholderText;
         }
 
+        private void ToggleSelectionColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (textEditor.SelectionHighlightColor == Application.Current.Resources["SystemControlHighlightAccentBrush"])
+            {
+                textEditor.SelectionHighlightColor = new SolidColorBrush(Colors.Green);
+            }
+            else
+            {
+                textEditor.SelectionHighlightColor = (SolidColorBrush)Application.Current.Resources["SystemControlHighlightAccentBrush"];
+            }
+            textBox.SelectionHighlightColor = textEditor.SelectionHighlightColor;
+        }
+
         private void ToggleTextAlignmentButton_Click(object sender, RoutedEventArgs e)
         {
             if ((int)textEditor.TextAlignment < 4)

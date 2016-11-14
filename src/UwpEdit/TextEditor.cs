@@ -35,9 +35,11 @@ namespace UwpEdit
         private ContentPresenter _headerContentPresenter;
         private CanvasHorizontalAlignment _horizontalAlignment;
         private bool _needsForgroundBrushRecreation;
+        private bool _needsSelectionHighlightColorBrushRecreation;
         private bool _needsTextFormatRecreation;
         private bool _needsTextLayoutRecreation;
         private ContentControl _placeholderTextContentPresenter;
+        private CanvasSolidColorBrush _selectionHighlightColorBrush;
         private CanvasTextFormat _textFormat;
         private CanvasTextLayout _textLayout;
 
@@ -88,6 +90,7 @@ namespace UwpEdit
             _needsTextFormatRecreation = true;
             _needsTextLayoutRecreation = true;
             _needsForgroundBrushRecreation = true;
+            _needsSelectionHighlightColorBrushRecreation = true;
         }
 
         private void CanvasElement_Draw(CanvasControl sender, CanvasDrawEventArgs args)
@@ -128,6 +131,12 @@ namespace UwpEdit
             {
                 _forgroundBrush?.Dispose();
                 _forgroundBrush = new CanvasSolidColorBrush(resourceCreator, (Foreground as SolidColorBrush).Color);
+            }
+
+            if (_needsSelectionHighlightColorBrushRecreation)
+            {
+                _selectionHighlightColorBrush?.Dispose();
+                _selectionHighlightColorBrush = new CanvasSolidColorBrush(resourceCreator, SelectionHighlightColor.Color);
             }
         }
 
@@ -172,6 +181,12 @@ namespace UwpEdit
             UpdateHeaderVisibility();
         }
 
+        private void OnSelectionHighlightColorPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsSelectionHighlightColorBrushRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
         private void OnTextAlignmentPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             UpdateTextAlignment();
@@ -209,6 +224,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(FontStyleProperty, OnFontStylePropertyChanged);
             RegisterPropertyChangedCallback(FontWeightProperty, OnFontWeightPropertyChanged);
             RegisterPropertyChangedCallback(FontStretchProperty, OnFontStretchPropertyChanged);
+            RegisterPropertyChangedCallback(SelectionHighlightColorProperty, OnSelectionHighlightColorPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)
