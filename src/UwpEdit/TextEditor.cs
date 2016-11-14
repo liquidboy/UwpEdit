@@ -97,6 +97,13 @@ namespace UwpEdit
 
         #region Private Methods
 
+        private static Rect InflateRect(Rect r)
+        {
+            return new Rect(
+                new Point(Math.Floor(r.Left), Math.Floor(r.Top)),
+                new Point(Math.Ceiling(r.Right), Math.Ceiling(r.Bottom)));
+        }
+
         private void CanvasElement_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
         {
             _needsTextFormatRecreation = true;
@@ -180,13 +187,6 @@ namespace UwpEdit
                 _selectionForegroundBrush?.Dispose();
                 _selectionForegroundBrush = new CanvasSolidColorBrush(resourceCreator, Colors.White);
             }
-        }
-
-        private Rect InflateRect(Rect r)
-        {
-            return new Rect(
-                new Point(Math.Floor(r.Left), Math.Floor(r.Top)),
-                new Point(Math.Ceiling(r.Right), Math.Ceiling(r.Bottom)));
         }
 
         private void OnFontFamilyPropertyChanged(DependencyObject sender, DependencyProperty dp)
