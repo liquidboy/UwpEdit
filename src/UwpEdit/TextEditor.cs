@@ -51,7 +51,7 @@ namespace UwpEdit
 
         private CanvasSolidColorBrush _selectionForegroundBrush;
         private CanvasSolidColorBrush _selectionHighlightColorBrush;
-        private List<Range> _selectionRanges;
+        private List<Range> _selectionRanges = new List<Range>();
         private CanvasTextFormat _textFormat;
         private CanvasTextLayout _textLayout;
 
@@ -122,16 +122,19 @@ namespace UwpEdit
 
             EnsureResources(sender, sender.Size);
 
-            if ((FocusState != FocusState.Unfocused) && (_selectionRanges?.Any() ?? false))
+            if ((FocusState != FocusState.Unfocused) && _selectionRanges.Any())
             {
                 foreach (var range in _selectionRanges)
                 {
-                    var descriptions = _textLayout.GetCharacterRegions(range.StartIndex, range.Length);
+                    var start = Math.Min(range.StartIndex, range.EndIndex);
+                    var length = (range.Length < 0) ? range.Length * -1 : range.Length;
+                    length++;
+                    var descriptions = _textLayout.GetCharacterRegions(start, length);
                     foreach (CanvasTextLayoutRegion description in descriptions)
                     {
                         args.DrawingSession.FillRectangle(InflateRect(description.LayoutBounds), _selectionHighlightColorBrush);
                     }
-                    _textLayout.SetBrush(range.StartIndex, range.Length, _selectionForegroundBrush);
+                    _textLayout.SetBrush(start, length, _selectionForegroundBrush);
                 }
             }
 
@@ -141,6 +144,32 @@ namespace UwpEdit
             s.Stop();
             System.Diagnostics.Debug.WriteLine($"Completed TextEditor.CanvasElement_Draw in {s.Elapsed}");
 #endif
+        }
+
+        private void CanvasElement_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            if (_selectionRanges.Any())
+            {
+                foreach (var point in e.GetIntermediatePoints(_canvasElement))
+                {
+                    if (point.IsInContact)
+                    {
+                        _selectionRanges.Last().EndIndex = GetHitIndex(point.Position);
+                        _canvasElement.Invalidate();
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        private void CanvasElement_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            Focus(FocusState.Pointer);
+            _selectionRanges.Clear();
+            var index = GetHitIndex(e.GetCurrentPoint(_canvasElement).Position);
+            _selectionRanges.Add(new Range() { StartIndex = index, EndIndex = index });
+            _canvasElement.Invalidate();
+            e.Handled = true;
         }
 
         private void CanvasElement_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -187,6 +216,13 @@ namespace UwpEdit
                 _selectionForegroundBrush?.Dispose();
                 _selectionForegroundBrush = new CanvasSolidColorBrush(resourceCreator, Colors.White);
             }
+        }
+
+        private int GetHitIndex(Point mouseOverPoint)
+        {
+            CanvasTextLayoutRegion textLayoutRegion;
+            _textLayout.HitTest((float)mouseOverPoint.X, (float)mouseOverPoint.Y, out textLayoutRegion);
+            return textLayoutRegion.CharacterIndex;
         }
 
         private void OnFontFamilyPropertyChanged(DependencyObject sender, DependencyProperty dp)
@@ -246,7 +282,7 @@ namespace UwpEdit
         private void OnTextPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             UpdatePlaceholderTextVisibility();
-            _selectionRanges?.Clear();
+            _selectionRanges.Clear();
             _canvasElement.Invalidate();
         }
 
@@ -261,6 +297,8 @@ namespace UwpEdit
             _canvasElement.CreateResources += CanvasElement_CreateResources;
             _canvasElement.SizeChanged += CanvasElement_SizeChanged;
             _canvasElement.Draw += CanvasElement_Draw;
+            _canvasElement.PointerPressed += CanvasElement_PointerPressed;
+            _canvasElement.PointerMoved += CanvasElement_PointerMoved;
         }
 
         private void RegisterPropertyChangedCallbacks()
@@ -284,7 +322,7 @@ namespace UwpEdit
 
         private void TextEditor_LostFocus(object sender, RoutedEventArgs e)
         {
-            _selectionRanges?.Clear();
+            _selectionRanges.Clear();
             _canvasElement?.Invalidate();
             VisualStateManager.GoToState(this, "Normal", true);
         }

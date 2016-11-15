@@ -13,7 +13,10 @@ namespace UwpEdit
     {
         #region Public Properties
 
-        public int Length { get; set; } = 0;
+        public int EndIndex { get; set; } = 0;
+
+        public int Length => EndIndex - StartIndex;
+
         public int StartIndex { get; set; } = 0;
 
         #endregion Public Properties

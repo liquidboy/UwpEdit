@@ -33,12 +33,8 @@ namespace UwpEdit
         /// <param name="length">The length of the selection, in characters.</param>
         public void Select(int start, int length)
         {
-            if (_selectionRanges == null)
-            {
-                _selectionRanges = new List<Range>();
-            }
             _selectionRanges.Clear();
-            _selectionRanges.Add(new Range() { StartIndex = start, Length = length });
+            _selectionRanges.Add(new Range() { StartIndex = start, EndIndex = start + length });
             _canvasElement.Invalidate();
         }
 
