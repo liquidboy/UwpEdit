@@ -9,18 +9,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
-// The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
-
 namespace UwpEdit
 {
-    /// <summary>
-    /// Primary UwpEdit control. Provides full editor capabilities.
-    /// </summary>
-    [TemplatePart(Name = "BackgroundElement", Type = typeof(Border))]
-    [TemplatePart(Name = "BorderElement", Type = typeof(Border))]
-    [TemplatePart(Name = "HeaderContentPresenter", Type = typeof(ContentPresenter))]
-    [TemplatePart(Name = "ContentElement", Type = typeof(ScrollViewer))]
-    [TemplatePart(Name = "PlaceholderTextContentPresenter", Type = typeof(ContentControl))]
     public sealed partial class TextEditor : Control
     {
         #region Public Properties
