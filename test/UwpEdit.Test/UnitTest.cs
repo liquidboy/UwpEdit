@@ -1,7 +1,4 @@
-﻿// Copyright (c) Phill Campbell. All rights reserved. Licensed under the MIT License. See LICENSE in
-// the project root for license information.
-
-using Xunit;
+﻿using Xunit;
 
 namespace UwpEdit.Test
 {
