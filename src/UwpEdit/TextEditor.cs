@@ -123,7 +123,7 @@ namespace UwpEdit
 
             // Draw selections
             bool drawnSelections = false;
-            if (!ReadOnly && (FocusState != FocusState.Unfocused) && _selectionRanges.Any())
+            if (!IsReadOnly && (FocusState != FocusState.Unfocused) && _selectionRanges.Any())
             {
                 foreach (var range in _selectionRanges)
                 {
@@ -144,7 +144,7 @@ namespace UwpEdit
             }
 
             // Draw cursor
-            if (!ReadOnly && FocusState != FocusState.Unfocused && !drawnSelections)
+            if (!IsReadOnly && FocusState != FocusState.Unfocused && !drawnSelections)
             {
                 var description = _textLayout.GetCharacterRegions(_cursorIndex, 1).Single();
                 args.DrawingSession.DrawLine((float)description.LayoutBounds.Left, (float)description.LayoutBounds.Top, (float)description.LayoutBounds.Left, (float)description.LayoutBounds.Bottom, _cursorColorBrush);
@@ -364,7 +364,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(FontStretchProperty, OnFontStretchPropertyChanged);
             RegisterPropertyChangedCallback(SelectionHighlightColorProperty, OnSelectionHighlightColorPropertyChanged);
             RegisterPropertyChangedCallback(CursorColorProperty, OnCursorColorPropertyChanged);
-            RegisterPropertyChangedCallback(ReadOnlyProperty, OnReadOnlyPropertyChanged);
+            RegisterPropertyChangedCallback(IsReadOnlyProperty, OnIsReadOnlyPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)

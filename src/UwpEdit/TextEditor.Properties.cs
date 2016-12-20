@@ -10,6 +10,7 @@ namespace UwpEdit
 {
     public sealed partial class TextEditor : Control
     {
+
         #region Public Properties
 
         /// <summary>
@@ -28,15 +29,14 @@ namespace UwpEdit
         public static DependencyProperty HeaderTemplateProperty { get; } = DependencyProperty.Register(nameof(HeaderTemplate), typeof(DataTemplate), typeof(TextEditor), null);
 
         /// <summary>
+        /// Identifies the IsReadOnly dependency property.
+        /// </summary>
+        public static DependencyProperty IsReadOnlyProperty { get; } = DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(TextEditor), null);
+
+        /// <summary>
         /// Identifies the PlaceholderText dependency property.
         /// </summary>
         public static DependencyProperty PlaceholderTextProperty { get; } = DependencyProperty.Register(nameof(PlaceholderText), typeof(string), typeof(TextEditor), null);
-
-        /// <summary>
-        /// Identifies the ReadOnly dependency property.
-        /// </summary>
-        public static DependencyProperty ReadOnlyProperty { get; } = DependencyProperty.Register(nameof(ReadOnly), typeof(bool), typeof(TextEditor), null);
-
         /// <summary>
         /// Identifies the SelectionHighlightColor dependency property.
         /// </summary>
@@ -68,16 +68,15 @@ namespace UwpEdit
         public DataTemplate HeaderTemplate { get { return (DataTemplate)GetValue(HeaderTemplateProperty); } set { SetValue(HeaderTemplateProperty, value); } }
 
         /// <summary>
+        /// Gets or sets whether the editor is read only.
+        /// </summary>
+        public bool IsReadOnly { get { return (bool)GetValue(IsReadOnlyProperty); } set { SetValue(IsReadOnlyProperty, value); } }
+
+        /// <summary>
         /// Gets or sets the text that is displayed in the control until the value is changed by a
         /// user action or some other operation.
         /// </summary>
         public string PlaceholderText { get { return (string)GetValue(PlaceholderTextProperty); } set { SetValue(PlaceholderTextProperty, value); } }
-
-        /// <summary>
-        /// Gets or sets whether the editor is read only.
-        /// </summary>
-        public bool ReadOnly { get { return (bool)GetValue(ReadOnlyProperty); } set { SetValue(ReadOnlyProperty, value); } }
-
         /// <summary>
         /// Gets or sets the brush used to highlight the selected text.
         /// </summary>
@@ -94,5 +93,6 @@ namespace UwpEdit
         public TextAlignment TextAlignment { get { return (TextAlignment)GetValue(TextAlignmentProperty); } set { SetValue(TextAlignmentProperty, value); } }
 
         #endregion Public Properties
+
     }
 }

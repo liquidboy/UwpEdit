@@ -66,7 +66,7 @@ namespace UwpEdit
             UpdateHeaderVisibility();
         }
 
-        private void OnReadOnlyPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        private void OnIsReadOnlyPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             _canvasElement.Invalidate();
         }
