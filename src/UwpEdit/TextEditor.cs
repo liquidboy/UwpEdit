@@ -34,16 +34,18 @@ namespace UwpEdit
 
         private CanvasControl _canvasElement;
         private ScrollViewer _contentElement;
+        private CanvasSolidColorBrush _cursorColorBrush;
+        private int _cursorIndex;
         private CanvasSolidColorBrush _foregroundBrush;
         private ContentPresenter _headerContentPresenter;
 
         private CanvasHorizontalAlignment _horizontalAlignment;
 
+        private bool _needsCursorColorBrushRecreation;
         private bool _needsForegroundBrushRecreation;
 
         private bool _needsSelectionForegroundBrushRecreation;
         private bool _needsSelectionHighlightColorBrushRecreation;
-
         private bool _needsTextFormatRecreation;
 
         private bool _needsTextLayoutRecreation;
@@ -110,6 +112,7 @@ namespace UwpEdit
             _needsTextLayoutRecreation = true;
             _needsForegroundBrushRecreation = true;
             _needsSelectionHighlightColorBrushRecreation = true;
+            _needsCursorColorBrushRecreation = true;
             _needsSelectionForegroundBrushRecreation = true;
         }
 
@@ -122,22 +125,36 @@ namespace UwpEdit
 
             EnsureResources(sender, sender.Size);
 
+            // Draw selections
+            bool drawnSelections = false;
             if ((FocusState != FocusState.Unfocused) && _selectionRanges.Any())
             {
                 foreach (var range in _selectionRanges)
                 {
                     var start = Math.Min(range.StartIndex, range.EndIndex);
                     var length = (range.Length < 0) ? range.Length * -1 : range.Length;
-                    length++;
-                    var descriptions = _textLayout.GetCharacterRegions(start, length);
-                    foreach (CanvasTextLayoutRegion description in descriptions)
+                    if (length > 0)
                     {
-                        args.DrawingSession.FillRectangle(InflateRect(description.LayoutBounds), _selectionHighlightColorBrush);
+                        length++;
+                        var descriptions = _textLayout.GetCharacterRegions(start, length);
+                        foreach (CanvasTextLayoutRegion description in descriptions)
+                        {
+                            args.DrawingSession.FillRectangle(InflateRect(description.LayoutBounds), _selectionHighlightColorBrush);
+                        }
+                        _textLayout.SetBrush(start, length, _selectionForegroundBrush);
+                        drawnSelections = true;
                     }
-                    _textLayout.SetBrush(start, length, _selectionForegroundBrush);
                 }
             }
 
+            // Draw cursor
+            if (FocusState != FocusState.Unfocused && !drawnSelections)
+            {
+                var description = _textLayout.GetCharacterRegions(_cursorIndex, 1).Single();
+                args.DrawingSession.DrawLine((float)description.LayoutBounds.Left, (float)description.LayoutBounds.Top, (float)description.LayoutBounds.Left, (float)description.LayoutBounds.Bottom, _cursorColorBrush);
+            }
+
+            // Draw text
             args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _foregroundBrush);
 
 #if DEBUG
@@ -166,8 +183,10 @@ namespace UwpEdit
         {
             Focus(FocusState.Pointer);
             _selectionRanges.Clear();
-            var index = GetHitIndex(e.GetCurrentPoint(_canvasElement).Position);
+            bool trailing;
+            var index = GetHitIndex(e.GetCurrentPoint(_canvasElement).Position, out trailing);
             _selectionRanges.Add(new Range() { StartIndex = index, EndIndex = index });
+            _cursorIndex = trailing ? index + 1 : index;
             _canvasElement.Invalidate();
             e.Handled = true;
         }
@@ -211,6 +230,12 @@ namespace UwpEdit
                 _selectionHighlightColorBrush = new CanvasSolidColorBrush(resourceCreator, SelectionHighlightColor.Color);
             }
 
+            if (_needsCursorColorBrushRecreation)
+            {
+                _cursorColorBrush?.Dispose();
+                _cursorColorBrush = new CanvasSolidColorBrush(resourceCreator, CursorColor.Color);
+            }
+
             if (_needsSelectionForegroundBrushRecreation)
             {
                 _selectionForegroundBrush?.Dispose();
@@ -220,9 +245,21 @@ namespace UwpEdit
 
         private int GetHitIndex(Point mouseOverPoint)
         {
+            bool trailing;
+            return GetHitIndex(mouseOverPoint, out trailing);
+        }
+
+        private int GetHitIndex(Point mouseOverPoint, out bool trailing)
+        {
             CanvasTextLayoutRegion textLayoutRegion;
-            _textLayout.HitTest((float)mouseOverPoint.X, (float)mouseOverPoint.Y, out textLayoutRegion);
+            _textLayout.HitTest((float)mouseOverPoint.X, (float)mouseOverPoint.Y, out textLayoutRegion, out trailing);
             return textLayoutRegion.CharacterIndex;
+        }
+
+        private void OnCursorColorPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsCursorColorBrushRecreation = true;
+            _canvasElement.Invalidate();
         }
 
         private void OnFontFamilyPropertyChanged(DependencyObject sender, DependencyProperty dp)
@@ -313,6 +350,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(FontWeightProperty, OnFontWeightPropertyChanged);
             RegisterPropertyChangedCallback(FontStretchProperty, OnFontStretchPropertyChanged);
             RegisterPropertyChangedCallback(SelectionHighlightColorProperty, OnSelectionHighlightColorPropertyChanged);
+            RegisterPropertyChangedCallback(CursorColorProperty, OnCursorColorPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)

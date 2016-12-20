@@ -26,6 +26,11 @@ namespace UwpEdit
         #region Public Properties
 
         /// <summary>
+        /// Identifies the CursorColor dependency property.
+        /// </summary>
+        public static DependencyProperty CursorColorProperty { get; } = DependencyProperty.Register(nameof(CursorColor), typeof(SolidColorBrush), typeof(TextEditor), null);
+
+        /// <summary>
         /// Identifies the Header dependency property.
         /// </summary>
         public static DependencyProperty HeaderProperty { get; } = DependencyProperty.Register(nameof(Header), typeof(object), typeof(TextEditor), null);
@@ -54,6 +59,11 @@ namespace UwpEdit
         /// Identifies the TextProperty dependency property.
         /// </summary>
         public static DependencyProperty TextProperty { get; } = DependencyProperty.Register(nameof(Text), typeof(string), typeof(TextEditor), null);
+
+        /// <summary>
+        /// Gets or sets the brush used to draw the cursor.
+        /// </summary>
+        public SolidColorBrush CursorColor { get { return (SolidColorBrush)GetValue(CursorColorProperty); } set { SetValue(CursorColorProperty, value); } }
 
         /// <summary>
         /// Gets or sets the content for the control's header.
