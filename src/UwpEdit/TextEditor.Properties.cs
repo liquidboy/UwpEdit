@@ -46,6 +46,11 @@ namespace UwpEdit
         public static DependencyProperty PlaceholderTextProperty { get; } = DependencyProperty.Register(nameof(PlaceholderText), typeof(string), typeof(TextEditor), null);
 
         /// <summary>
+        /// Identifies the ReadOnly dependency property.
+        /// </summary>
+        public static DependencyProperty ReadOnlyProperty { get; } = DependencyProperty.Register(nameof(ReadOnly), typeof(bool), typeof(TextEditor), null);
+
+        /// <summary>
         /// Identifies the SelectionHighlightColor dependency property.
         /// </summary>
         public static DependencyProperty SelectionHighlightColorProperty { get; } = DependencyProperty.Register(nameof(SelectionHighlightColor), typeof(SolidColorBrush), typeof(TextEditor), null);
@@ -80,6 +85,11 @@ namespace UwpEdit
         /// user action or some other operation.
         /// </summary>
         public string PlaceholderText { get { return (string)GetValue(PlaceholderTextProperty); } set { SetValue(PlaceholderTextProperty, value); } }
+
+        /// <summary>
+        /// Gets or sets whether the editor is read only.
+        /// </summary>
+        public bool ReadOnly { get { return (bool)GetValue(ReadOnlyProperty); } set { SetValue(ReadOnlyProperty, value); } }
 
         /// <summary>
         /// Gets or sets the brush used to highlight the selected text.

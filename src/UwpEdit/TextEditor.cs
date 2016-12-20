@@ -127,7 +127,7 @@ namespace UwpEdit
 
             // Draw selections
             bool drawnSelections = false;
-            if ((FocusState != FocusState.Unfocused) && _selectionRanges.Any())
+            if (!ReadOnly && (FocusState != FocusState.Unfocused) && _selectionRanges.Any())
             {
                 foreach (var range in _selectionRanges)
                 {
@@ -148,7 +148,7 @@ namespace UwpEdit
             }
 
             // Draw cursor
-            if (FocusState != FocusState.Unfocused && !drawnSelections)
+            if (!ReadOnly && FocusState != FocusState.Unfocused && !drawnSelections)
             {
                 var description = _textLayout.GetCharacterRegions(_cursorIndex, 1).Single();
                 args.DrawingSession.DrawLine((float)description.LayoutBounds.Left, (float)description.LayoutBounds.Top, (float)description.LayoutBounds.Left, (float)description.LayoutBounds.Bottom, _cursorColorBrush);
@@ -303,6 +303,11 @@ namespace UwpEdit
             UpdateHeaderVisibility();
         }
 
+        private void OnReadOnlyPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _canvasElement.Invalidate();
+        }
+
         private void OnSelectionHighlightColorPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             _needsSelectionHighlightColorBrushRecreation = true;
@@ -351,6 +356,7 @@ namespace UwpEdit
             RegisterPropertyChangedCallback(FontStretchProperty, OnFontStretchPropertyChanged);
             RegisterPropertyChangedCallback(SelectionHighlightColorProperty, OnSelectionHighlightColorPropertyChanged);
             RegisterPropertyChangedCallback(CursorColorProperty, OnCursorColorPropertyChanged);
+            RegisterPropertyChangedCallback(ReadOnlyProperty, OnReadOnlyPropertyChanged);
         }
 
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)
