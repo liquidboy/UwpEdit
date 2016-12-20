@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
+using Windows.System;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -181,7 +182,9 @@ namespace UwpEdit
             bool trailing;
             var index = GetHitIndex(e.GetCurrentPoint(_canvasElement).Position, out trailing);
             _selectionRanges.Add(new Range() { StartIndex = index, EndIndex = index });
+
             _cursorIndex = trailing ? index + 1 : index;
+
             _canvasElement.Invalidate();
             e.Handled = true;
         }
@@ -189,6 +192,48 @@ namespace UwpEdit
         private void CanvasElement_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             _needsTextLayoutRecreation = true;
+        }
+
+        private int CharacterIndexToLineIndex(int characterIndex)
+        {
+            int characterCount = 0;
+            for (int i = 0; i < _textLayout.LineMetrics.Count(); i++)
+            {
+                characterCount += _textLayout.LineMetrics[i].CharacterCount;
+                if (characterCount > characterIndex)
+                {
+                    return i;
+                }
+            }
+            throw new ArgumentOutOfRangeException();
+        }
+
+        private int CharacterOffsetInLine(int characterIndex)
+        {
+            int characterCount = 0;
+            for (int i = 0; i < _textLayout.LineMetrics.Count(); i++)
+            {
+                characterCount += _textLayout.LineMetrics[i].CharacterCount;
+                if (characterCount > characterIndex)
+                {
+                    return characterIndex - (characterCount - _textLayout.LineMetrics[i].CharacterCount);
+                }
+            }
+            throw new ArgumentOutOfRangeException();
+        }
+
+        private Range CharacterRangeForLine(int lineIndex)
+        {
+            int characterCount = 0;
+            for (int i = 0; i < _textLayout.LineMetrics.Count(); i++)
+            {
+                if (i == lineIndex)
+                {
+                    return new Range() { StartIndex = characterCount, EndIndex = characterCount + _textLayout.LineMetrics[i].CharacterCount };
+                }
+                characterCount += _textLayout.LineMetrics[i].CharacterCount;
+            }
+            throw new ArgumentOutOfRangeException();
         }
 
         private void EnsureResources(ICanvasResourceCreatorWithDpi resourceCreator, Size targetSize)
@@ -251,6 +296,45 @@ namespace UwpEdit
             return textLayoutRegion.CharacterIndex;
         }
 
+        private void MoveCursor(int moveBy)
+        {
+            if (moveBy > 0)
+            {
+                _cursorIndex = Math.Min(_cursorIndex + moveBy, Text.Length);
+            }
+            else
+            {
+                _cursorIndex = Math.Max(_cursorIndex + moveBy, 0);
+            }
+            _canvasElement.Invalidate();
+        }
+
+        private void MoveCursorByLine(int moveBy)
+        {
+            var currentLine = CharacterIndexToLineIndex(_cursorIndex);
+            var offsetInLine = CharacterOffsetInLine(_cursorIndex);
+            int nextLine;
+            if (moveBy > 0)
+            {
+                nextLine = Math.Min(currentLine + moveBy, _textLayout.LineCount - 1);
+            }
+            else
+            {
+                nextLine = Math.Max(currentLine + moveBy, 0);
+            }
+            var lineRange = CharacterRangeForLine(nextLine);
+            _cursorIndex = Math.Min(lineRange.StartIndex + offsetInLine, lineRange.EndIndex);
+            if (moveBy > 0)
+            {
+                _cursorIndex = Math.Min(_cursorIndex, Text.Length);
+            }
+            else
+            {
+                _cursorIndex = Math.Max(_cursorIndex, 0);
+            }
+            _canvasElement.Invalidate();
+        }
+
         private void RegisterEventHandlers()
         {
             Unloaded += TextEditor_Unloaded;
@@ -258,6 +342,7 @@ namespace UwpEdit
             PointerExited += TextEditor_PointerExited;
             GotFocus += TextEditor_GotFocus;
             LostFocus += TextEditor_LostFocus;
+            KeyDown += TextEditor_KeyDown;
 
             _canvasElement.CreateResources += CanvasElement_CreateResources;
             _canvasElement.SizeChanged += CanvasElement_SizeChanged;
@@ -285,6 +370,28 @@ namespace UwpEdit
         private void TextEditor_GotFocus(object sender, RoutedEventArgs e)
         {
             VisualStateManager.GoToState(this, "Focused", true);
+        }
+
+        private void TextEditor_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case VirtualKey.Left:
+                    MoveCursor(-1);
+                    break;
+
+                case VirtualKey.Up:
+                    MoveCursorByLine(-1);
+                    break;
+
+                case VirtualKey.Right:
+                    MoveCursor(1);
+                    break;
+
+                case VirtualKey.Down:
+                    MoveCursorByLine(1);
+                    break;
+            }
         }
 
         private void TextEditor_LostFocus(object sender, RoutedEventArgs e)
