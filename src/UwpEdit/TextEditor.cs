@@ -405,6 +405,12 @@ namespace UwpEdit
             switch (e.Key)
             {
                 case VirtualKey.Back:
+                    if (_cursorIndex > 0)
+                    {
+                        Text = Text.Substring(0, _cursorIndex - 1) + Text.Substring(_cursorIndex);
+                        _cursorIndex--;
+                        _canvasElement.Invalidate();
+                    }
                     e.Handled = true;
                     break;
 
@@ -429,7 +435,11 @@ namespace UwpEdit
                     break;
 
                 case VirtualKey.Delete:
-                    e.Handled = true;
+                    if (_cursorIndex < Text.Length)
+                    {
+                        Text = Text.Substring(0, _cursorIndex) + Text.Substring(_cursorIndex + 1);
+                        _canvasElement.Invalidate();
+                    }
                     break;
             }
         }
