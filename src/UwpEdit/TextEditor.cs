@@ -9,6 +9,7 @@ using System.Linq;
 using Windows.Foundation;
 using Windows.System;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -236,6 +237,27 @@ namespace UwpEdit
             throw new ArgumentOutOfRangeException();
         }
 
+        private void CoreWindow_CharacterReceived(CoreWindow sender, CharacterReceivedEventArgs args)
+        {
+            if (IsReadOnly)
+            {
+                return;
+            }
+
+            var character = (char)args.KeyCode;
+
+            // skip certain control keys that are still passed as characters
+            if (character == '\b')
+            {
+                return;
+            }
+
+            Text = Text.Insert(_cursorIndex, character.ToString());
+            MoveCursor(1);
+
+            args.Handled = true;
+        }
+
         private void EnsureResources(ICanvasResourceCreatorWithDpi resourceCreator, Size targetSize)
         {
             if (_needsTextFormatRecreation)
@@ -342,6 +364,7 @@ namespace UwpEdit
             PointerExited += TextEditor_PointerExited;
             GotFocus += TextEditor_GotFocus;
             LostFocus += TextEditor_LostFocus;
+            Window.Current.CoreWindow.CharacterReceived += CoreWindow_CharacterReceived;
             KeyDown += TextEditor_KeyDown;
 
             _canvasElement.CreateResources += CanvasElement_CreateResources;
@@ -374,22 +397,39 @@ namespace UwpEdit
 
         private void TextEditor_KeyDown(object sender, KeyRoutedEventArgs e)
         {
+            if (IsReadOnly || e.Handled)
+            {
+                return;
+            }
+
             switch (e.Key)
             {
+                case VirtualKey.Back:
+                    e.Handled = true;
+                    break;
+
                 case VirtualKey.Left:
                     MoveCursor(-1);
+                    e.Handled = true;
                     break;
 
                 case VirtualKey.Up:
                     MoveCursorByLine(-1);
+                    e.Handled = true;
                     break;
 
                 case VirtualKey.Right:
                     MoveCursor(1);
+                    e.Handled = true;
                     break;
 
                 case VirtualKey.Down:
                     MoveCursorByLine(1);
+                    e.Handled = true;
+                    break;
+
+                case VirtualKey.Delete:
+                    e.Handled = true;
                     break;
             }
         }
