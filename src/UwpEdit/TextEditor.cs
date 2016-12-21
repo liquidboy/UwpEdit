@@ -6,6 +6,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Windows.Foundation;
 using Windows.System;
 using Windows.UI;
@@ -29,22 +30,26 @@ namespace UwpEdit
     {
         #region Private Fields
 
+        private CanvasSolidColorBrush _backgroundBrush;
         private CanvasControl _canvasElement;
         private ScrollViewer _contentElement;
         private CanvasSolidColorBrush _cursorColorBrush;
         private int _cursorIndex;
         private CanvasSolidColorBrush _foregroundBrush;
         private ContentPresenter _headerContentPresenter;
-
         private CanvasHorizontalAlignment _horizontalAlignment;
-
+        private CanvasTextFormat _lineNumberTextFormat;
+        private CanvasTextLayout _lineNumberTextLayout;
+        private int _marginPadding = 3;
+        private int _marginWidth = 50;
+        private bool _needsBackgroundBrushRecreation;
         private bool _needsCursorColorBrushRecreation;
         private bool _needsForegroundBrushRecreation;
-
+        private bool _needsLineNumberTextFormatRecreation;
+        private bool _needsLineNumberTextLayoutRecreation;
         private bool _needsSelectionForegroundBrushRecreation;
         private bool _needsSelectionHighlightColorBrushRecreation;
         private bool _needsTextFormatRecreation;
-
         private bool _needsTextLayoutRecreation;
         private ContentControl _placeholderTextContentPresenter;
 
@@ -79,6 +84,7 @@ namespace UwpEdit
             _headerContentPresenter = GetTemplateChild("HeaderContentPresenter") as ContentPresenter;
             _placeholderTextContentPresenter = GetTemplateChild("PlaceholderTextContentPresenter") as ContentControl;
             _contentElement = GetTemplateChild("ContentElement") as ScrollViewer;
+            _contentElement.Padding = new Thickness(0);
             _canvasElement = new CanvasControl();
             _contentElement.Content = _canvasElement;
 
@@ -108,9 +114,12 @@ namespace UwpEdit
             _needsTextFormatRecreation = true;
             _needsTextLayoutRecreation = true;
             _needsForegroundBrushRecreation = true;
+            _needsBackgroundBrushRecreation = true;
             _needsSelectionHighlightColorBrushRecreation = true;
             _needsCursorColorBrushRecreation = true;
             _needsSelectionForegroundBrushRecreation = true;
+            _needsLineNumberTextFormatRecreation = true;
+            _needsLineNumberTextLayoutRecreation = true;
         }
 
         private void CanvasElement_Draw(CanvasControl sender, CanvasDrawEventArgs args)
@@ -136,7 +145,9 @@ namespace UwpEdit
                         var descriptions = _textLayout.GetCharacterRegions(start, length);
                         foreach (CanvasTextLayoutRegion description in descriptions)
                         {
-                            args.DrawingSession.FillRectangle(InflateRect(description.LayoutBounds), _selectionHighlightColorBrush);
+                            var rect = description.LayoutBounds;
+                            rect.X += _marginWidth + _marginPadding;
+                            args.DrawingSession.FillRectangle(InflateRect(rect), _selectionHighlightColorBrush);
                         }
                         _textLayout.SetBrush(start, length, _selectionForegroundBrush);
                         drawnSelections = true;
@@ -148,11 +159,18 @@ namespace UwpEdit
             if (!IsReadOnly && FocusState != FocusState.Unfocused && !drawnSelections)
             {
                 var description = _textLayout.GetCharacterRegions(_cursorIndex, 1).Single();
-                args.DrawingSession.DrawLine((float)description.LayoutBounds.Left, (float)description.LayoutBounds.Top, (float)description.LayoutBounds.Left, (float)description.LayoutBounds.Bottom, _cursorColorBrush);
+                var left = (float)description.LayoutBounds.Left + _marginWidth + _marginPadding;
+                args.DrawingSession.DrawLine(left, (float)description.LayoutBounds.Top, left, (float)description.LayoutBounds.Bottom, _cursorColorBrush);
             }
 
+            // Draw margin background
+            args.DrawingSession.FillRectangle(0, 0, _marginWidth, (float)_lineNumberTextLayout.RequestedSize.Height, _foregroundBrush);
+
+            // Draw line numbers
+            args.DrawingSession.DrawTextLayout(_lineNumberTextLayout, 0, 0, _backgroundBrush);
+
             // Draw text
-            args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _foregroundBrush);
+            args.DrawingSession.DrawTextLayout(_textLayout, _marginWidth + _marginPadding, 0, _foregroundBrush);
 
             // Update canvas height
             UpdateCanvasHeight();
@@ -171,7 +189,9 @@ namespace UwpEdit
                 {
                     if (point.IsInContact)
                     {
-                        _selectionRanges.Last().EndIndex = GetHitIndex(point.Position);
+                        var position = point.Position;
+                        position.X -= _marginWidth + _marginPadding;
+                        _selectionRanges.Last().EndIndex = GetHitIndex(position);
                         _canvasElement.Invalidate();
                         e.Handled = true;
                     }
@@ -184,7 +204,9 @@ namespace UwpEdit
             Focus(FocusState.Pointer);
             _selectionRanges.Clear();
             bool trailing;
-            var index = GetHitIndex(e.GetCurrentPoint(_canvasElement).Position, out trailing);
+            var position = e.GetCurrentPoint(_canvasElement).Position;
+            position.X -= _marginWidth + _marginPadding;
+            var index = GetHitIndex(position, out trailing);
             _selectionRanges.Add(new Range() { StartIndex = index, EndIndex = index });
 
             _cursorIndex = trailing ? index + 1 : index;
@@ -280,13 +302,19 @@ namespace UwpEdit
             if (_needsTextLayoutRecreation)
             {
                 _textLayout?.Dispose();
-                _textLayout = new CanvasTextLayout(resourceCreator, Text, _textFormat, (float)targetSize.Width, (float)targetSize.Height);
+                _textLayout = new CanvasTextLayout(resourceCreator, Text, _textFormat, (float)targetSize.Width - _marginWidth - _marginPadding, (float)targetSize.Height);
             }
 
             if (_needsForegroundBrushRecreation)
             {
                 _foregroundBrush?.Dispose();
                 _foregroundBrush = new CanvasSolidColorBrush(resourceCreator, (Foreground as SolidColorBrush).Color);
+            }
+
+            if (_needsBackgroundBrushRecreation)
+            {
+                _backgroundBrush?.Dispose();
+                _backgroundBrush = new CanvasSolidColorBrush(resourceCreator, (Background as SolidColorBrush).Color);
             }
 
             if (_needsSelectionHighlightColorBrushRecreation)
@@ -305,6 +333,39 @@ namespace UwpEdit
             {
                 _selectionForegroundBrush?.Dispose();
                 _selectionForegroundBrush = new CanvasSolidColorBrush(resourceCreator, Colors.White);
+            }
+
+            if (_needsLineNumberTextFormatRecreation)
+            {
+                _lineNumberTextFormat?.Dispose();
+                _lineNumberTextFormat = new CanvasTextFormat()
+                {
+                    HorizontalAlignment = CanvasHorizontalAlignment.Right,
+                    FontFamily = FontFamily.Source,
+                    FontSize = (float)FontSize,
+                };
+            }
+
+            if (_needsLineNumberTextLayoutRecreation)
+            {
+                _lineNumberTextLayout?.Dispose();
+                var lineNumberSb = new StringBuilder();
+                var characterCount = 0;
+                var lineNumber = 1;
+                lineNumberSb.AppendLine(lineNumber++.ToString());
+                foreach (var lineMetric in _textLayout.LineMetrics)
+                {
+                    characterCount += lineMetric.CharacterCount;
+                    if (Text[characterCount - 1] == '\n' || Text[characterCount - 1] == '\r')
+                    {
+                        lineNumberSb.AppendLine(lineNumber++.ToString());
+                    }
+                    else
+                    {
+                        lineNumberSb.AppendLine();
+                    }
+                }
+                _lineNumberTextLayout = new CanvasTextLayout(resourceCreator, lineNumberSb.ToString(), _lineNumberTextFormat, _marginWidth - _marginPadding, (float)targetSize.Height);
             }
         }
 
@@ -381,6 +442,7 @@ namespace UwpEdit
         {
             RegisterPropertyChangedCallback(HeaderProperty, OnHeaderPropertyChanged);
             RegisterPropertyChangedCallback(ForegroundProperty, OnForegroundPropertyChanged);
+            RegisterPropertyChangedCallback(BackgroundProperty, OnBackgroundPropertyChanged);
             RegisterPropertyChangedCallback(TextProperty, OnTextPropertyChanged);
             RegisterPropertyChangedCallback(FontSizeProperty, OnFontSizePropertyChanged);
             RegisterPropertyChangedCallback(FontFamilyProperty, OnFontFamilyPropertyChanged);
@@ -479,6 +541,9 @@ namespace UwpEdit
             _selectionHighlightColorBrush?.Dispose();
             _selectionForegroundBrush?.Dispose();
             _foregroundBrush?.Dispose();
+            _backgroundBrush?.Dispose();
+            _lineNumberTextFormat?.Dispose();
+            _lineNumberTextLayout?.Dispose();
             _textLayout?.Dispose();
             _textFormat?.Dispose();
         }

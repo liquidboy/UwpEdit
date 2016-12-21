@@ -19,6 +19,12 @@ namespace UwpEdit
     {
         #region Private Methods
 
+        private void OnBackgroundPropertyChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _needsBackgroundBrushRecreation = true;
+            _canvasElement.Invalidate();
+        }
+
         private void OnCursorColorPropertyChanged(DependencyObject sender, DependencyProperty dp)
         {
             _needsCursorColorBrushRecreation = true;

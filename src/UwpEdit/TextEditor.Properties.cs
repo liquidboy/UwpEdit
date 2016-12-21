@@ -10,7 +10,6 @@ namespace UwpEdit
 {
     public sealed partial class TextEditor : Control
     {
-
         #region Public Properties
 
         /// <summary>
@@ -37,6 +36,7 @@ namespace UwpEdit
         /// Identifies the PlaceholderText dependency property.
         /// </summary>
         public static DependencyProperty PlaceholderTextProperty { get; } = DependencyProperty.Register(nameof(PlaceholderText), typeof(string), typeof(TextEditor), null);
+
         /// <summary>
         /// Identifies the SelectionHighlightColor dependency property.
         /// </summary>
@@ -77,6 +77,7 @@ namespace UwpEdit
         /// user action or some other operation.
         /// </summary>
         public string PlaceholderText { get { return (string)GetValue(PlaceholderTextProperty); } set { SetValue(PlaceholderTextProperty, value); } }
+
         /// <summary>
         /// Gets or sets the brush used to highlight the selected text.
         /// </summary>
@@ -93,6 +94,5 @@ namespace UwpEdit
         public TextAlignment TextAlignment { get { return (TextAlignment)GetValue(TextAlignmentProperty); } set { SetValue(TextAlignmentProperty, value); } }
 
         #endregion Public Properties
-
     }
 }
