@@ -154,6 +154,9 @@ namespace UwpEdit
             // Draw text
             args.DrawingSession.DrawTextLayout(_textLayout, 0, 0, _foregroundBrush);
 
+            // Update canvas height
+            UpdateCanvasHeight();
+
 #if DEBUG
             s.Stop();
             System.Diagnostics.Debug.WriteLine($"Completed TextEditor.CanvasElement_Draw in {s.Elapsed}");
@@ -478,6 +481,12 @@ namespace UwpEdit
             _foregroundBrush?.Dispose();
             _textLayout?.Dispose();
             _textFormat?.Dispose();
+        }
+
+        private void UpdateCanvasHeight()
+        {
+            var dips = _textLayout.LineMetrics.Sum(x => x.Height);
+            _canvasElement.Height = dips * (Windows.Graphics.Display.DisplayInformation.GetForCurrentView().LogicalDpi / 96);
         }
 
         private void UpdateHeaderVisibility()
