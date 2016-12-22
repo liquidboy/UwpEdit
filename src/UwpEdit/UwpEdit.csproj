@@ -157,8 +157,11 @@
   </Target>
 
   <Target Name="AfterBuild">
-    <Copy Condition="'$(Configuration)'=='Release'"
+    <Copy Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'"
           SourceFiles="$(TargetPath);$(ProjectPriFullPath)"
-          DestinationFolder="build\nuget\lib\uap10.0\$(Platform)" />
+          DestinationFolder="build\nuget\lib\uap10.0" />
+    <Copy Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'"
+          SourceFiles="$(OutputPath)\$(AssemblyName).xr.xml"
+          DestinationFolder="build\nuget\lib\uap10.0\$(AssemblyName)" />
   </Target>
 </Project>
