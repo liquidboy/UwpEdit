@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>UwpEdit</id>
+    <version>1.0.0-alpha1</version>
+    <title>UwpEdit</title>
+    <authors>ph1ll</authors>
+    <owners>ph1ll</owners>
+    <licenseUrl>https://github.com/ph1ll/UwpEdit/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/ph1ll/UwpEdit</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Code editor control for UWP</description>
+    <releaseNotes>See https://github.com/ph1ll/UwpEdit/releases</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>UWP editor</tags>
+    <dependencies>
+      <dependency id="Win2D.uwp" version="1.19.0" />
+    </dependencies>
+  </metadata>
+</package>
